@@ -5,12 +5,13 @@ import (
     "encoding/json"
     "log"
     "net/http"
+    "time"
 
     influxdb3 "github.com/InfluxCommunity/influxdb3-go/v2/influxdb3"
 )
 
 const (
-	influxHost  = "http://192.168.xx.xxx:8181"
+	influxHost  = "http://192.168.xx.xx:8181"
     influxToken = "123456789abcdefghijklmnopqr"
     influxDB    = "my_database"
 )
@@ -46,11 +47,14 @@ func main() {
             return
         }
 
+        startTime := time.Now()
         iterator, err := client.Query(context.Background(), reqBody.Query)
         if err != nil {
             w.Header().Set("Content-Type", "application/json")
             w.WriteHeader(http.StatusBadRequest)
-            json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+            json.NewEncoder(w).Encode(map[string]string{
+                "error": err.Error(),
+            })
             return
         }
 
@@ -60,8 +64,14 @@ func main() {
             results = append(results, row)
         }
 
+        queryDuration := time.Since(startTime).Seconds()
+        response := map[string]interface{}{
+            "duration": queryDuration,
+            "results":  results,
+        }
+
         w.Header().Set("Content-Type", "application/json")
-        json.NewEncoder(w).Encode(results)
+        json.NewEncoder(w).Encode(response)
     })
 
     log.Println("Server is running at http://0.0.0.0:8080 ...")
