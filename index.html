@@ -1,0 +1,69 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="/static/styles.css">
+  <title>InfluxDB3 Query Runner Powered by Go Lang</title>
+</head>
+<body>
+	<h1><center>InfluxDB SQL Query client Powered by Go Lang</center></h1>
+	<center><textarea id="queryInput" placeholder="Enter SQL-like query here" style="width: 872px; height: 302px;"></textarea></center>
+	<br>
+	<center><button id="runBtn">Run Query</button></center>
+
+  <table id="resultsTable"></table>
+
+  <script>
+    document.getElementById('runBtn').addEventListener('click', () => {
+      const queryText = document.getElementById('queryInput').value;
+      if (!queryText.trim()) {
+        alert("Please enter a query.");
+        return;
+      }
+      fetch('/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: queryText })
+      })
+      .then(response => {
+        if (!response.ok) {
+          return response.text().then(text => { throw new Error(text || 'Request failed'); });
+        }
+        return response.json();
+      })
+      .then(data => {
+        const table = document.getElementById('resultsTable');
+        table.innerHTML = '';
+
+        if (data.error) {
+          alert("Error: " + data.error);
+          return;
+        }
+        if (!Array.isArray(data) || data.length === 0) {
+          table.innerHTML = '<tr><td>No results found.</td></tr>';
+          return;
+        }
+        const headers = Object.keys(data[0]);
+        let headerRow = '<tr>' + headers.map(col => `<th>${col}</th>`).join('') + '</tr>';
+        table.insertAdjacentHTML('beforeend', headerRow);
+
+        data.forEach(row => {
+          let rowHtml = '<tr>' + headers.map(col => `<td>${row[col]}</td>`).join('') + '</tr>';
+          table.insertAdjacentHTML('beforeend', rowHtml);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Failed to fetch results: " + err.message);
+      });
+    });
+    const dateElement = document.getElementById('dateDisplay');
+    const today = new Date();
+    dateElement.textContent = today.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  </script>
+</body>
+</html>
