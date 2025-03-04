@@ -16,6 +16,8 @@ const (
     influxDB    = "my_database"
 )
 
+var content embed.FS
+
 func main() {
     client, err := influxdb3.New(influxdb3.ClientConfig{
         Host:     influxHost,
