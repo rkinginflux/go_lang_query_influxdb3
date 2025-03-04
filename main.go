@@ -2,6 +2,7 @@ package main
 
 import (
     "context"
+    "embed"
     "encoding/json"
     "log"
     "net/http"
@@ -11,10 +12,10 @@ import (
 )
 
 const (
-	influxHost  = "http://192.168.xx.xx:8181"
-    	influxToken = "123456789abcdefghijklmnopqr"
-    	influxDB    = "my_database"
-      )
+    influxHost  = "http://192.168.0.63:8181"
+    influxToken = "apiv3_j864z0VmbPEdJIKyeLRLdJI5uagYAHZFgZC2BKuy_WsKxLo8PZ9R-GLWskSCVBp7jTzb16z1uLMijdHnc9MdTQ"
+    influxDB    = "support_ear_data"
+)
 
 var content embed.FS
 
@@ -70,6 +71,34 @@ func main() {
         response := map[string]interface{}{
             "duration": queryDuration,
             "results":  results,
+        }
+
+        w.Header().Set("Content-Type", "application/json")
+        json.NewEncoder(w).Encode(response)
+    })
+
+    http.HandleFunc("/query_history", func(w http.ResponseWriter, r *http.Request) {
+        query := `SELECT query_text AS "Query" FROM system.queries`
+        iterator, err := client.Query(context.Background(), query)
+        if err != nil {
+            w.Header().Set("Content-Type", "application/json")
+            w.WriteHeader(http.StatusBadRequest)
+            json.NewEncoder(w).Encode(map[string]string{
+                "error": err.Error(),
+            })
+            return
+        }
+
+        var queries []string
+        for iterator.Next() {
+            row := iterator.Value()
+            if queryText, ok := row["Query"].(string); ok {
+                queries = append(queries, queryText)
+            }
+        }
+
+        response := map[string]interface{}{
+            "queries": queries,
         }
 
         w.Header().Set("Content-Type", "application/json")
