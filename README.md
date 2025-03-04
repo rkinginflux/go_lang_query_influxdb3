@@ -13,4 +13,4 @@ Directory structure should look like this.
     └── styles.css
 
 
-![Screenshot](images/query2.png)
+![Screenshot](query2.png)
