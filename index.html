@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
+	<div id="dateDisplay"></div>
 
 	<center><h1>InfluxDB3 GO Lang Query Client</h1></center>
 
@@ -37,7 +38,7 @@
             .then(response => response.json())
             .then(data => {
                 const table = document.getElementById('resultsTable');
-                table.innerHTML = ''; 
+                table.innerHTML = '';
 
                 if (data.error) {
                     alert("Error: " + data.error);
@@ -67,6 +68,15 @@
             });
         });
     </script>
-
+    <script>
+    const dateElement = document.getElementById('dateDisplay');
+    const today = new Date();
+    dateElement.textContent = today.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  </script>
 </body>
 </html>
