@@ -220,27 +220,30 @@ tr:hover {
     }
 }
 
+/* Ensure table headers have a yellow background */
 table {
     width: 100%;
     border-collapse: collapse;
 }
 
 th {
-    background-color: yellow; 
-    color: black;  
+    background-color: yellow; /* Ensure the entire header is yellow */
+    color: black;  /* Adjust text color for readability */
     padding: 10px;
     text-align: left;
     font-weight: bold;
 }
 
+/* Ensure the table rows have the correct color */
 tr:nth-child(even) {
-    background-color: #1c1c3c; 
+    background-color: #1c1c3c; /* Dark blue for even rows */
 }
 
 tr:nth-child(odd) {
-    background-color: #23234c; 
+    background-color: #23234c; /* Slightly different shade for odd rows */
 }
 
+/* Ensure table cells have proper spacing */
 td {
     padding: 8px;
     border: 1px solid #333;
@@ -267,4 +270,13 @@ td {
     border-radius: 8px;
     animation: glow 1.5s infinite alternate;
     margin: 0;
+}
+
+.dropbtn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
 }
