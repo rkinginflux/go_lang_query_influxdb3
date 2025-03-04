@@ -12,5 +12,6 @@ Directory structure should look like this.
 └── static
     └── styles.css
 
-<img src="images/query2.png" width="600">
+![Screenshot](images/query2.png)
+
 
