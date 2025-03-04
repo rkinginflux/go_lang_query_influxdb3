@@ -12,9 +12,9 @@ import (
 
 const (
 	influxHost  = "http://192.168.xx.xx:8181"
-    influxToken = "123456789abcdefghijklmnopqr"
-    influxDB    = "my_database"
-)
+    	influxToken = "123456789abcdefghijklmnopqr"
+    	influxDB    = "my_database"
+      )
 
 var content embed.FS
 
