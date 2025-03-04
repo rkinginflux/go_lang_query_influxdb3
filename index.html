@@ -6,17 +6,26 @@
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-	<div id="dateDisplay"></div>
+    <div id="dateDisplay"></div>
 
-	<center><h1>InfluxDB3 GO Lang Query Client</h1></center>
+    <center><h1>InfluxDB3 GO Lang Query Client</h1></center>
 
-	<center><form id="queryForm">
-        <textarea id="queryInput" placeholder="Enter SQL-like query here" style="width: 872px; height: 302px;"></textarea>
-	<br>
-        <button type="button" id="runBtn">Run Query</button>
-	<br>
-		</form></center>
-	<br>
+    <center>
+        <form id="queryForm">
+            <br><br>
+            <textarea id="queryInput" placeholder="Enter SQL-like query here" style="width: 872px; height: 302px;"></textarea>
+            <br>
+            <button type="button" id="runBtn">Run Query</button>
+            <br>
+        </form>
+    </center>
+    <br>
+    <center><testform>
+		    <label for="querySelect"><h2>Choose Your Query:</h2></label>
+            <select id="querySelect">
+                <option value="">-- Select a query --</option>
+            </select>
+	    </testform></center>
 
     <p id="queryDuration" style="font-size: 1rem; color: cyan; font-weight: bold; margin-top: 10px;"></p>
 
@@ -67,16 +76,43 @@
                 alert("Failed to fetch results: " + err.message);
             });
         });
+
+        // Fetch and populate the dropdown menu with saved queries
+        function fetchQueries() {
+            fetch('/query_history')
+            .then(response => response.json())
+            .then(data => {
+                const querySelect = document.getElementById('querySelect');
+                querySelect.innerHTML = '<option value="">-- Select a query --</option>';
+                data.queries.forEach(query => {
+                    const option = document.createElement('option');
+                    option.value = query;
+                    option.textContent = query;
+                    querySelect.appendChild(option);
+                });
+            })
+            .catch(err => {
+                console.error("Failed to fetch query history: ", err);
+            });
+        }
+
+        document.getElementById('querySelect').addEventListener('change', (event) => {
+            document.getElementById('queryInput').value = event.target.value;
+        });
+
+        // Fetch queries when the page loads
+        fetchQueries();
     </script>
+
     <script>
-    const dateElement = document.getElementById('dateDisplay');
-    const today = new Date();
-    dateElement.textContent = today.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  </script>
+        const dateElement = document.getElementById('dateDisplay');
+        const today = new Date();
+        dateElement.textContent = today.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    </script>
 </body>
 </html>
