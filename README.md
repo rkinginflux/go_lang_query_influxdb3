@@ -12,6 +12,5 @@ Directory structure should look like this.
 └── static
     └── styles.css
 
-![Screenshot](images/query2.png)
-
+![Screenshot](https://raw.githubusercontent.com/kinginflux/go_lang_query_influxdb3/main/images/query2.png)
 
