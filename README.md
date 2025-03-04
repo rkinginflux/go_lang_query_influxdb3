@@ -11,3 +11,6 @@ Directory structure should look like this.
 ├── main.go
 └── static
     └── styles.css
+
+
+![Screenshot](images/query2.png)
