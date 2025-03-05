@@ -41,7 +41,6 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             fetchDatabases();
-            fetchQueries();
         });
 
         function fetchDatabases() {
@@ -77,8 +76,16 @@
         }
 
         function fetchQueries() {
-            console.log("Fetching query history...");
-            fetch('/query_history')
+            const selectedDatabase = document.getElementById('databaseSelect').value;
+
+            if (!selectedDatabase) {
+                console.warn("No database selected, cannot fetch query history.");
+                return;
+            }
+
+            console.log(`Fetching query history for database: ${selectedDatabase}...`);
+
+            fetch(`/query_history?database=${encodeURIComponent(selectedDatabase)}`)
                 .then(response => response.json())
                 .then(data => {
                     console.log("Received query history:", data);
@@ -100,6 +107,9 @@
                     console.error("Failed to fetch query history: ", err);
                 });
         }
+
+        // Update query history when a database is selected
+        document.getElementById('databaseSelect').addEventListener('change', fetchQueries);
 
         document.getElementById('runBtn').addEventListener('click', () => {
             const queryText = document.getElementById('queryInput').value;
@@ -160,16 +170,6 @@
                 month: 'long',
                 day: 'numeric'
             });
-        });
-    </script>
-    <script>
-        const dateElement = document.getElementById('dateDisplay');
-        const today = new Date();
-        dateElement.textContent = today.toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
         });
     </script>
 </body>
