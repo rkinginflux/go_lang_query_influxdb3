@@ -12,4 +12,11 @@ Directory structure should look like this.
 └── static
     └── styles.css
 
+Troubleshooting curl commands.
+```bash
+curl -X GET "http://localhost:8080/query_history?database=crime"
+curl -X GET "http://localhost:8080/databases"
+curl -X GET "http://localhost:8080/static/styles.css"
+curl -X GET "http://192.168.0.63:8181/api/v3/configure/database?format=json" -H "Authorization: Bearer $TOKEN"
+
 
