@@ -12,37 +12,112 @@
 
     <center>
         <form id="queryForm">
+            <br>
+            <label for="databaseSelect"><h2>Select Database:</h2></label>
+            <select id="databaseSelect">
+                <option value="">-- Select a database --</option>
+            </select>
             <br><br>
-            <textarea id="queryInput" placeholder="Enter SQL-like query here" style="width: 872px; height: 302px;"></textarea>
+            <textarea id="queryInput" placeholder="Enter SQL-like query here" style="width: 783px; height: 331px;"></textarea>
             <br>
             <button type="button" id="runBtn">Run Query</button>
             <br>
         </form>
     </center>
     <br>
-    <center><testform>
-		    <label for="querySelect"><h2>Choose Your Query:</h2></label>
+    <center>
+        <div>
+            <label for="querySelect"><h2>Query History:</h2></label>
             <select id="querySelect">
                 <option value="">-- Select a query --</option>
             </select>
-	    </testform></center>
+        </div>
+    </center>
 
     <p id="queryDuration" style="font-size: 1rem; color: cyan; font-weight: bold; margin-top: 10px;"></p>
 
     <table id="resultsTable"></table>
 
     <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchDatabases();
+            fetchQueries();
+        });
+
+        function fetchDatabases() {
+            console.log("Fetching databases...");
+            fetch('/databases')
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Received databases:", data);
+                    if (!data.databases || data.databases.length === 0) {
+                        console.warn("No databases received.");
+                        return;
+                    }
+
+                    const databaseSelect = document.getElementById('databaseSelect');
+                    if (!databaseSelect) {
+                        console.error("Dropdown element not found in HTML!");
+                        return;
+                    }
+
+                    databaseSelect.innerHTML = '<option value="">-- Select a database --</option>';
+                    data.databases.forEach(db => {
+                        console.log("Adding database:", db);
+                        const option = document.createElement('option');
+                        option.value = db;
+                        option.textContent = db;
+                        databaseSelect.appendChild(option);
+                    });
+                })
+                .catch(err => {
+                    console.error("Failed to fetch databases: ", err);
+                    alert("Could not load databases. Check the server logs.");
+                });
+        }
+
+        function fetchQueries() {
+            console.log("Fetching query history...");
+            fetch('/query_history')
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Received query history:", data);
+                    if (!data.queries || data.queries.length === 0) {
+                        console.warn("No query history found.");
+                        return;
+                    }
+
+                    const querySelect = document.getElementById('querySelect');
+                    querySelect.innerHTML = '<option value="">-- Select a query --</option>';
+                    data.queries.forEach(query => {
+                        const option = document.createElement('option');
+                        option.value = query;
+                        option.textContent = query;
+                        querySelect.appendChild(option);
+                    });
+                })
+                .catch(err => {
+                    console.error("Failed to fetch query history: ", err);
+                });
+        }
+
         document.getElementById('runBtn').addEventListener('click', () => {
             const queryText = document.getElementById('queryInput').value;
+            const selectedDatabase = document.getElementById('databaseSelect').value;
+
             if (!queryText.trim()) {
                 alert("Please enter a query.");
+                return;
+            }
+            if (!selectedDatabase) {
+                alert("Please select a database.");
                 return;
             }
 
             fetch('/query', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query: queryText })
+                body: JSON.stringify({ query: queryText, database: selectedDatabase })
             })
             .then(response => response.json())
             .then(data => {
@@ -54,8 +129,7 @@
                     return;
                 }
 
-                const durationDisplay = document.getElementById('queryDuration');
-                durationDisplay.textContent = `Query Time: ${data.duration.toFixed(3)} seconds`;
+                document.getElementById('queryDuration').textContent = `Query Time: ${data.duration.toFixed(3)} seconds`;
 
                 if (!data.results.length) {
                     table.innerHTML = '<tr><td>No results found.</td></tr>';
@@ -77,33 +151,17 @@
             });
         });
 
-        // Fetch and populate the dropdown menu with saved queries
-        function fetchQueries() {
-            fetch('/query_history')
-            .then(response => response.json())
-            .then(data => {
-                const querySelect = document.getElementById('querySelect');
-                querySelect.innerHTML = '<option value="">-- Select a query --</option>';
-                data.queries.forEach(query => {
-                    const option = document.createElement('option');
-                    option.value = query;
-                    option.textContent = query;
-                    querySelect.appendChild(option);
-                });
-            })
-            .catch(err => {
-                console.error("Failed to fetch query history: ", err);
+        document.addEventListener("DOMContentLoaded", () => {
+            const dateElement = document.getElementById('dateDisplay');
+            const today = new Date();
+            dateElement.textContent = today.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
             });
-        }
-
-        document.getElementById('querySelect').addEventListener('change', (event) => {
-            document.getElementById('queryInput').value = event.target.value;
         });
-
-        // Fetch queries when the page loads
-        fetchQueries();
     </script>
-
     <script>
         const dateElement = document.getElementById('dateDisplay');
         const today = new Date();
