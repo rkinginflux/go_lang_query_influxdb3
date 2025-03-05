@@ -88,7 +88,7 @@
             fetch(`/query_history?database=${encodeURIComponent(selectedDatabase)}`)
                 .then(response => response.json())
                 .then(data => {
-                    console.log("Received query history:", data);
+                    console.log(`Received query history for ${selectedDatabase}:`, data);
                     if (!data.queries || data.queries.length === 0) {
                         console.warn("No query history found.");
                         return;
@@ -96,12 +96,16 @@
 
                     const querySelect = document.getElementById('querySelect');
                     querySelect.innerHTML = '<option value="">-- Select a query --</option>';
+
                     data.queries.forEach(query => {
                         const option = document.createElement('option');
                         option.value = query;
                         option.textContent = query;
                         querySelect.appendChild(option);
                     });
+
+                    // Store selected database for reference
+                    querySelect.dataset.selectedDatabase = selectedDatabase;
                 })
                 .catch(err => {
                     console.error("Failed to fetch query history: ", err);
@@ -110,6 +114,18 @@
 
         // Update query history when a database is selected
         document.getElementById('databaseSelect').addEventListener('change', fetchQueries);
+
+        // Populate query input when selecting a query from history
+        document.getElementById('querySelect').addEventListener('change', function () {
+            const selectedQuery = this.value;
+            if (!selectedQuery) {
+                console.warn("No query selected.");
+                return;
+            }
+
+            console.log(`Populating query input with: ${selectedQuery}`);
+            document.getElementById('queryInput').value = selectedQuery;
+        });
 
         document.getElementById('runBtn').addEventListener('click', () => {
             const queryText = document.getElementById('queryInput').value;
