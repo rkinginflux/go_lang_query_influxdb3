@@ -13,8 +13,8 @@ import (
 
 // Constants for InfluxDB
 const (
-    influxHost  = "http://192.168.0.63:8181"
-    influxToken = "apiv3_j864z0VmbPEdJIKyeLRLdJI5uagYAHZFgZC2BKuy_WsKxLo8PZ9R-GLWskSCVBp7jTzb16z1uLMijdHnc9MdTQ"
+    influxHost  = "http://192.168.xx.xx:8181"
+    influxToken = "YOUR_TOKEN"
 )
 
 // Embed static files (HTML, CSS, etc.)
