@@ -84,11 +84,19 @@ func fetchDatabasesHandler(w http.ResponseWriter, r *http.Request) {
 
 // Fetch query history
 func fetchQueryHistoryHandler(w http.ResponseWriter, r *http.Request) {
-    log.Println("Fetching query history from InfluxDB...")
+    database := r.URL.Query().Get("database")
+    if database == "" {
+        log.Println("Error: Database not specified for query history")
+        http.Error(w, "Database not specified", http.StatusBadRequest)
+        return
+    }
+
+    log.Println("Fetching query history from database:", database)
 
     client, err := influxdb3.New(influxdb3.ClientConfig{
-        Host:  influxHost,
-        Token: influxToken,
+        Host:     influxHost,
+        Token:    influxToken,
+        Database: database,
     })
     if err != nil {
         log.Println("Failed to create InfluxDB client:", err)
