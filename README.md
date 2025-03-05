@@ -18,7 +18,8 @@ curl -X GET "http://localhost:8080/databases"
 curl -X GET "http://localhost:8080/static/styles.css"
 
 List all Databases
-curl -X GET "http://localhost:8181/api/v3/configure/database?format=json" -H "Authorization: Bearer $TOKEN"
+curl -X GET "http://db3_server:8181/api/v3/configure/database?format=json" -H "Authorization: Bearer $TOKEN"
+
 Should look someghing like...
 [
   {
@@ -32,4 +33,15 @@ Should look someghing like...
   }
 ]
 
+OR
+curl -X GET "http://db3_server:8181/api/v3/configure/database?format=pretty" -H "Authorization: Bearer $TOKEN"
+
+Should look something like...
++------------------+
+| iox::database    |
++------------------+
+| crime            |
+| ev_cars          |
+| support_ear_data |
++------------------+
 
