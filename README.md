@@ -12,8 +12,7 @@ Directory structure should look like this.
 └── static
     └── styles.css
 
-Troubleshooting curl commands.
-```bash
+Troubleshooting curl commands
 curl -X GET "http://localhost:8080/query_history?database=crime"
 curl -X GET "http://localhost:8080/databases"
 curl -X GET "http://localhost:8080/static/styles.css"
