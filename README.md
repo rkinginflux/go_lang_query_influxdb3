@@ -42,6 +42,7 @@ Should look somethng like...
 
 This should display the contents of the styles.css file 
 curl -X GET "http://localhost:8080/static/styles.css"
+
 -----------------------------------------------------------------------
 
 List all Databases
