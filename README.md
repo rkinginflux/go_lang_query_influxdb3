@@ -34,6 +34,7 @@ Should look someghing like...
 ]
 
 OR
+
 curl -X GET "http://db3_server:8181/api/v3/configure/database?format=pretty" -H "Authorization: Bearer $TOKEN"
 
 Should look something like...
