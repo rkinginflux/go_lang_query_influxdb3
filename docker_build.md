@@ -8,7 +8,7 @@ docker save influxdb3-query-client:latest -o influxdb3-query-client.tar
 ```
 
 ```bash
-sudo ctr -n k8s.io images import influxdb-query-client.tar
+sudo ctr -n k8s.io images import influxdb3-query-client.tar
 ```
 
 ## Check it
