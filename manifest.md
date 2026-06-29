@@ -19,6 +19,12 @@ spec:
         - name: influxdb3-query-client
           image: influxdb3-query-client:latest
           imagePullPolicy: Never
+          env:
+            - name: INFLUX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: db3-token
+                  key: influxToken
           ports:
             - containerPort: 8080
 ---
