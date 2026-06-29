@@ -6,6 +6,7 @@ import (
     "encoding/json"
     "log"
     "net/http"
+    "strings"
     "time"
 
     influxdb3 "github.com/InfluxCommunity/influxdb3-go/v2/influxdb3"
@@ -135,15 +136,22 @@ func executeQueryHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     var reqBody struct {
-        Query    string `json:"query"`
-        Database string `json:"database"`
+        Query     string `json:"query"`
+        Database  string `json:"database"`
+        QueryType string `json:"query_type"`
     }
     if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil || reqBody.Query == "" || reqBody.Database == "" {
         http.Error(w, "Invalid request. Provide a query and a database.", http.StatusBadRequest)
         return
     }
 
-    log.Println("Executing query on database:", reqBody.Database)
+    queryType, err := parseQueryType(reqBody.QueryType)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
+
+    log.Printf("Executing %s query on database: %s", queryType.String(), reqBody.Database)
 
     client, err := influxdb3.New(influxdb3.ClientConfig{
         Host:     influxHost,
@@ -158,7 +166,7 @@ func executeQueryHandler(w http.ResponseWriter, r *http.Request) {
     defer client.Close()
 
     startTime := time.Now()
-    iterator, err := client.Query(context.Background(), reqBody.Query)
+    iterator, err := client.Query(context.Background(), reqBody.Query, influxdb3.WithQueryType(queryType))
     if err != nil {
         log.Println("Error executing query:", err)
         http.Error(w, err.Error(), http.StatusBadRequest)
@@ -173,12 +181,32 @@ func executeQueryHandler(w http.ResponseWriter, r *http.Request) {
 
     queryDuration := time.Since(startTime).Seconds()
     response := map[string]interface{}{
-        "duration": queryDuration,
-        "results":  results,
+        "duration":   queryDuration,
+        "query_type": strings.ToLower(queryType.String()),
+        "results":    results,
     }
 
     log.Println("Query executed successfully in", queryDuration, "seconds")
 
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(response)
+}
+
+func parseQueryType(queryType string) (influxdb3.QueryType, error) {
+    switch strings.ToLower(strings.TrimSpace(queryType)) {
+    case "", "sql":
+        return influxdb3.SQL, nil
+    case "influxql":
+        return influxdb3.InfluxQL, nil
+    default:
+        return influxdb3.SQL, &requestError{Message: "Invalid query_type. Supported values: sql, influxql"}
+    }
+}
+
+type requestError struct {
+    Message string
+}
+
+func (e *requestError) Error() string {
+    return e.Message
 }

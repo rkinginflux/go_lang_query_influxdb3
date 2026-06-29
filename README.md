@@ -15,6 +15,21 @@ Directory structure should look like this.
 
 Troubleshooting curl commands
 
+Run SQL query (default query_type is sql if omitted):
+
+curl -X POST "http://localhost:8080/query" \
+  -H "Content-Type: application/json" \
+  -d '{"database":"ev_cars","query":"SELECT * FROM system.queries LIMIT 5","query_type":"sql"}'
+
+Run InfluxQL query:
+
+curl -X POST "http://localhost:8080/query" \
+  -H "Content-Type: application/json" \
+  -d '{"database":"ev_cars","query":"SHOW MEASUREMENTS","query_type":"influxql"}'
+
+Supported query_type values: sql, influxql
+
+
 curl -X GET "http://localhost:8080/query_history?database=ev_cars"
 
 Should look something like...
