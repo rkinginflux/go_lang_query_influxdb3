@@ -20,6 +20,8 @@ spec:
           image: influxdb3-query-client:latest
           imagePullPolicy: Never
           env:
+            - name: INFLUX_HOST
+              value: "http://db3-influxdb3-enterprise-querier.influxdb3.svc.cluster.local:8181"
             - name: INFLUX_TOKEN
               valueFrom:
                 secretKeyRef:

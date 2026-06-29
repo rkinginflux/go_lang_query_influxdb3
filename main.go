@@ -15,22 +15,30 @@ import (
 
 // Constants for InfluxDB
 const (
-    influxHost = "http://db3-influxdb3-enterprise-querier.influxdb3.svc.cluster.local:818"
+    defaultInfluxHost = "http://db3-influxdb3-enterprise-querier.influxdb3.svc.cluster.local:8181"
 )
 
-var influxToken string
+var (
+    influxHost  string
+    influxToken string
+)
 
 // Embed static files (HTML, CSS, etc.)
 //go:embed index.html
 var content embed.FS
 
 func main() {
+    influxHost = strings.TrimSpace(os.Getenv("INFLUX_HOST"))
+    if influxHost == "" {
+        influxHost = defaultInfluxHost
+    }
+
     influxToken = strings.TrimSpace(os.Getenv("INFLUX_TOKEN"))
     if influxToken == "" {
         log.Fatal("Missing INFLUX_TOKEN environment variable. Configure your Kubernetes deployment to load it from secret db3-token key influxToken.")
     }
 
-    log.Println("Starting InfluxDB Query Client...")
+    log.Printf("Starting InfluxDB Query Client using INFLUX_HOST=%s", influxHost)
 
     // Serve Static Files (CSS, Images, JS)
     http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
